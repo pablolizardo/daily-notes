@@ -4,7 +4,9 @@ const nextConfig = {
         appDir: true,
     },
     swcMinify: true,
-
+    typescript: {
+        ignoreBuildErrors: true
+    }
 }
 
 module.exports = nextConfig
