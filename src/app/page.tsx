@@ -1,23 +1,16 @@
 "use client";
 import Column from "@/components/common/Column";
 import WhatToSay from "@/components/common/WhatToSay";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent
-} from "@/components/ui/card";
-import { TypographyH1 } from "@/components/ui/typography";
+import { TypographyH1, TypographyLead } from "@/components/ui/typography";
 import { COLUMNS } from "@/consts/columns";
-import { askBard, fetchGHData } from "@/lib/utils";
-import { TasksType } from "@/types/tasks";
-import { Loader2, Stars } from "lucide-react";
-import { ClipboardEvent, FormEvent, useState } from "react";
-import ReactMarkdown from 'react-markdown';
+import { askBard } from "@/lib/utils";
+import { ColumnType, TasksType } from "@/types/tasks";
+import { useState } from "react";
 
 export default function Home() {
   const [whatToSay, setWhatToSay] = useState<string>();
   const [thinking, setThinking] = useState<boolean>(false);
-  const [tasks, setTasks] = useState<TasksType>({ yesterday: [], today: [], blocker: [] })
+  const [tasks, setTasks] = useState<TasksType>({ yesterday: [], today: [], blocker: [], } as TasksType)
 
   const handleAsk = async () => {
     setThinking(true)
@@ -26,38 +19,27 @@ export default function Home() {
     setThinking(false)
   }
 
-
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    if (e.target.childNodes[0].value !== '') {
-      const value = ((e.target as HTMLFormElement).childNodes[0] as HTMLInputElement).value
-      const column = (e.target as HTMLFormElement).name
-      setTasks({ ...tasks, [column]: [...tasks[column], value] })
-      e.target.childNodes[0].value = ''
-    }
+  const handleSubmit = (column: ColumnType, content: string) => {
+    setTasks({ ...tasks, [column]: [...tasks[column], content] })
   };
 
-  const handlePaste = async (e: ClipboardEvent<HTMLInputElement>) => {
-    const clipboardText = e.clipboardData.getData('text')
-    if (clipboardText.includes('https://github.com')) {
-      const data = await fetchGHData(clipboardText)
-      console.log(data)
-      const column = (e.target as HTMLFormElement).parentElement?.name
-      const content = `${data.title} ${data.url} #${data.issueNumber} #${data.repo}`
-      setTasks({ ...tasks, [column]: [...tasks[column], content] })
-      e.target.value = ''
-    }
-  }
-
   return (
-    <main className="mx-auto max-w-[100rem] p-10 grid gap-10">
-      <TypographyH1>Daily Notes</TypographyH1>
-      <section className="grid lg:grid-cols-2 2xl:grid-cols-[1fr_600px] gap-5 items-start">
-        <div className="grid  2xl:grid-cols-3 gap-5 items-start">
-          {COLUMNS.map(column => <Column key={column.name} column={column} handleSubmit={handleSubmit} handlePaste={handlePaste} tasks={tasks} />)}
+    <main className="mx-auto max-w-[100rem] p-10 grid gap-10 min-h-screen ">
+      <section className="grid lg:grid-cols-2 2xl:grid-cols-[1.5fr_1fr] gap-5 items-start  h-full">
+        <div className="flex flex-col gap-10 h-full ">
+          <header className="grid gap-3">
+            <TypographyH1>Daily Notes</TypographyH1>
+            <TypographyLead className="max-w-lg">Beautifully designed components that you can copy and paste into your apps. Accessible. Customizable. Open Source.</TypographyLead>
+          </header>
+
+          <div className=" grid 2xl:grid-cols-3 gap-5 items-start h-full">
+            {COLUMNS.map(column => <Column key={column.name} column={column} handleSubmit={handleSubmit} tasks={tasks} />)}
+          </div>
         </div>
         <WhatToSay thinking={thinking} handleAsk={handleAsk} whatToSay={whatToSay} />
       </section>
+
+
     </main>
   );
 }

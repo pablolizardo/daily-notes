@@ -1,4 +1,5 @@
 import { GHIssue } from "@/types/gh-issues";
+import { TasksType } from "@/types/tasks";
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -24,7 +25,8 @@ export const fetchGHData = async (url: string): Promise<{
   }
 }
 
-export const askBard = async (tasks) => {
+
+export const askBard = async (tasks: TasksType) => {
   const response = await (
     await fetch("/api/ask", {
       method: "POST",
